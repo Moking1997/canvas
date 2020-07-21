@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      canvas {
+        border: 1px solid #999;
+        background: #999;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+  </body>
+  <script>
+    const log = console.log.bind(console);
+    const canvas = document.querySelector("#canvas");
+    const context = canvas.getContext("2d");
+
+    class Ball {
+      constructor() {
+        this.x = 0;
+        this.y = 0;
+        this.vx = 3;
+        this.vy = 0;
+        this.radius = 20;
+        this.angle = 0;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(30, this.y + this.radius);
+        ctx.lineTo(this.x, this.y + this.radius);
+        ctx.stroke();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = "#38d8ca";
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+    let balls = [];
+    for (let i = 0; i < 5; i++) {
+      const ball = new Ball();
+      ball.x = 30;
+      ball.y = i * 100 + 50;
+      ball.vx = i * 1;
+      ball.vy = i * 0.1;
+      balls.push(ball);
+    }
+
+    const drawFrame = function () {
+      window.requestAnimationFrame(drawFrame);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      let friction = 0.99;
+      for (let i = 0; i < 5; i++) {
+        const ball = balls[i];
+        ball.vx *= friction;
+        ball.vy *= friction;
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+        ball.draw(context);
+      }
+    };
+
+    drawFrame();
+  </script>
+</html>

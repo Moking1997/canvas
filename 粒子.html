@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      canvas {
+        border: 1px solid #999;
+        background: #45cb96;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+  </body>
+  <script>
+    const log = console.log.bind(console);
+    const randomColor = () => {
+      return "#" + Math.floor(Math.random() * 16777215).toString(16);
+    };
+
+    const canvas = document.querySelector("#canvas");
+    const context = canvas.getContext("2d");
+
+    class Ball {
+      constructor(radius, color) {
+        this.x = 0;
+        this.y = 0;
+        this.vx = 3;
+        this.vy = 0;
+        this.radius = radius;
+        this.angle = 0;
+        this.color = color || "#fff";
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = this.color;
+        ctx.strokeStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      checkWalls() {
+        if (this.x + this.radius > canvas.width) {
+          this.x = canvas.width - this.radius;
+          this.vx *= -1;
+        } else if (this.x - this.radius < 0) {
+          this.x = this.radius;
+          this.vx *= -1;
+        }
+
+        if (this.y + this.radius > canvas.height) {
+          this.y = canvas.height - this.radius;
+          this.vy *= -1;
+        } else if (this.y - this.radius < 0) {
+          this.y = this.radius;
+          this.vy *= -1;
+        }
+      }
+
+      move() {
+        this.x += this.vx;
+        this.y += this.vy;
+      }
+
+      update(context) {
+        this.move();
+        this.checkWalls();
+        this.draw(context);
+      }
+    }
+
+    let balls = [];
+    let numBalls = 40;
+    let long = 100;
+
+    for (let i = 0; i < numBalls; i++) {
+      let radius = Math.random() * 5 + 5;
+      let color = "#fff";
+      let ball = new Ball(radius, color);
+      ball.x = Math.random() * canvas.width;
+      ball.y = Math.random() * canvas.height;
+      ball.mass = Math.random() * 5 + 2;
+      ball.vx = Math.random() * 6 - 3;
+      ball.vy = Math.random() * 6 - 3;
+      balls.push(ball);
+    }
+
+    const update = function (ball) {
+      ball.update(context);
+    };
+    function rotate(x, y, sin, cos, reverse) {
+      return {
+        x: reverse ? x * cos + y * sin : x * cos - y * sin,
+        y: reverse ? y * cos - x * sin : y * cos + x * sin,
+      };
+    }
+
+    function checkCollision(ball0, ball1) {
+      let dx = ball1.x - ball0.x,
+        dy = ball1.y - ball0.y,
+        dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < ball0.radius + ball1.radius) {
+        let angle = Math.atan2(dy, dx),
+          sin = Math.sin(angle),
+          cos = Math.cos(angle);
+
+        //rotate ball0 position
+        let pos0 = {
+          x: 0,
+          y: 0,
+        };
+
+        //rotate ball1 position
+        let pos1 = rotate(dx, dy, sin, cos, true);
+
+        //rotate ball0 velocity
+        let vel0 = rotate(ball0.vx, ball0.vy, sin, cos, true);
+
+        //rotate ball1 velocity
+        let vel1 = rotate(ball1.vx, ball1.vy, sin, cos, true);
+
+        //collision reaction
+
+        let vxTotal = vel0.x - vel1.x;
+
+        vel0.x =
+          ((ball0.mass - ball1.mass) * vel0.x + 2 * ball1.mass * vel1.x) /
+          (ball0.mass + ball1.mass);
+        vel1.x = vxTotal + vel0.x;
+
+        //update position - to avoid objects becoming stuck together
+        let absV = Math.abs(vel0.x) + Math.abs(vel1.x),
+          overlap = ball0.radius + ball1.radius - Math.abs(pos0.x - pos1.x);
+        //update position
+        pos0.x += (vel0.x / absV) * overlap;
+        pos1.x += (vel1.x / absV) * overlap;
+
+        //rotate everything back
+        let pos0F = rotate(pos0.x, pos0.y, sin, cos, false);
+        let pos1F = rotate(pos1.x, pos1.y, sin, cos, false);
+
+        //adjust position to actual screen position
+        ball1.x = ball0.x + pos1F.x;
+        ball1.y = ball0.y + pos1F.y;
+        ball0.x = ball0.x + pos0F.x;
+        ball0.y = ball0.y + pos0F.y;
+
+        //rotate velocity back
+        let vel0F = rotate(vel0.x, vel0.y, sin, cos, false);
+        let vel1F = rotate(vel1.x, vel1.y, sin, cos, false);
+
+        ball0.vx = vel0F.x;
+        ball0.vy = vel0F.y;
+        ball1.vx = vel1F.x;
+        ball1.vy = vel1F.y;
+      }
+    }
+
+    function drawLine(ball0, ball1) {
+      let dx = ball1.x - ball0.x,
+        dy = ball1.y - ball0.y,
+        dist = Math.sqrt(dx * dx + dy * dy);
+      let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+
+      if (dist < long) {
+        context.save();
+        context.strokeStyle = "rgba(255,255,255,0.5)";
+        context.beginPath();
+        context.moveTo(ball0.x, ball0.y);
+        context.lineTo(ball1.x, ball1.y);
+        context.closePath();
+        context.stroke();
+        context.restore();
+      }
+    }
+
+    const drawFrame = function () {
+      window.requestAnimationFrame(drawFrame);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      for (let ballA, i = 0, len = numBalls - 1; i < len; i++) {
+        ballA = balls[i];
+        for (let ballB, j = i + 1; j < numBalls; j++) {
+          ballB = balls[j];
+          checkCollision(ballA, ballB);
+          drawLine(ballA, ballB);
+        }
+      }
+      balls.forEach(update);
+    };
+
+    drawFrame();
+  </script>
+</html>
