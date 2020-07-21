@@ -13,14 +13,14 @@
   </head>
 
   <body>
-    <canvas id="canvas" width="600" height="600"></canvas>
+    <canvas id="canvas" width="1200" height="1200"></canvas>
   </body>
   <script>
     const log = console.log.bind(console);
     const canvas = document.querySelector("#canvas");
     const context = canvas.getContext("2d");
 
-    colors = [
+    const colors = [
       "#f44336",
       "#e91e63",
       "#9c27b0",
@@ -45,7 +45,9 @@
         this.y = y;
         this.vx = 3;
         this.vy = 0;
-        this.radius = radius * Math.random();
+        this.radius = 1 ;
+        this.speed = 0.5
+        this.radiusMax =  radius;
         this.angle = 0;
         this.color = color || "#fff";
       }
@@ -54,6 +56,7 @@
         ctx.save();
         ctx.fillStyle = this.color;
         ctx.beginPath();
+        this.setRadius()
         ctx.arc(this.x, this.y, this.radius, Math.PI * 2, false);
         ctx.closePath();
         ctx.fill();
@@ -63,6 +66,13 @@
       move() {
         this.x += this.vx;
         this.y += this.vy;
+      }
+
+      setRadius(){
+        this.radius += this.speed
+        if (this.radius >= this.radiusMax || this.radius <= 1) {
+          this.speed *= -1
+        } 
       }
 
       update(context) {
@@ -75,30 +85,33 @@
       constructor(text) {
         this.x = 0;
         this.y = 0;
-        this.size = 110;
+        this.size = 200;
         this.text = text;
         this.textZone = [];
+        this.spaceX = 10
+        this.spaceY = 10
       }
 
       draw(ctx) {
         ctx.save();
         ctx.textAlign = "center";
         ctx.font = this.size + "px arial";
-        ctx.fillText("Hello world", canvas.width / 2, canvas.height / 2);
+        ctx.fillText(this.text, canvas.width / 2, canvas.height / 2);
         ctx.restore();
 
         let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
         let buffer32 = new Uint32Array(imgData.data.buffer);
-        log(buffer32.length);
-        for (let i = 0; i < canvas.width; i++) {
-          for (let j = 0; j < canvas.height; j++) {
+        for (let i = 0; i < canvas.width; i+=this.spaceX) {
+          for (let j = 0; j < canvas.height; j+=this.spaceY){
             if (buffer32[canvas.width * j + i]) {
-              let particle = new Ball(i, j, 2);
+              let color = colors[Math.floor(Math.random() * colors.length)]
+              let particle = new Ball(i, j, 10, color);
               this.textZone.push(particle);
             }
           }
         }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
 
       getValue() {}
@@ -110,15 +123,17 @@
     for (var i = 0; i < shape.textZone.length; i++) {
       shape.textZone[i].draw(context);
     }
+    // let particle = new Ball(100, 100, 10, '#49f');
+    // particle.draw(context)
+    const drawFrame = function () {
+      window.requestAnimationFrame(drawFrame);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      for (var i = 0; i < shape.textZone.length; i++) {
+        shape.textZone[i].update(context);
+      }
+      // particle.update(context)
+    };
 
-    // const drawFrame = function () {
-    //   window.requestAnimationFrame(drawFrame);
-    //   context.clearRect(0, 0, canvas.width, canvas.height);
-    //   for (var i = 0; i < shape.textZone.length; i++) {
-    //     shape.textZone[i].update(context);
-    //   }
-    // };
-
-    // drawFrame();
+    drawFrame();
   </script>
 </html>
