@@ -20,7 +20,7 @@ class Shape {
     for (let i = 0; i < _W; i += _SpaceX) {
       for (let j = 0; j < _H; j += _SpaceY) {
         if (buffer32[_W * j + i]) {
-          let color = randomColors(colors);
+          let color = colors[Math.floor(Math.random() * colors.length)];
           let particle = new Particle(i, j, radiusValue, color);
           this.textZone.push(particle);
         }

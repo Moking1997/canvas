@@ -25,8 +25,8 @@ const globalConfig = () => {
   ];
 
   window.wordValue = "O(∩_∩)O";
-  window.ParticleShape = 3;
-  window.radiusValue = 8;
+  window.ParticleShape = 0;
+  window.radiusValue = 5;
   window.breathSpeed = 0.15;
   window._SpaceX = 7;
   window._SpaceY = 7;
@@ -35,12 +35,20 @@ const globalConfig = () => {
 };
 
 const globalControl = () => {
+  // 按钮
   let btn = e("#btn");
   let control = e("#control");
   let shapes = es(".shape");
-  bindEvent(btn, "click", () => {
-    control.classList.toggle("hide");
-  });
+  // 控制变量
+  let word = e("#word");
+  let breath = e("#breath");
+  let radius = e("#radius");
+  let spaceX = e("#spaceX");
+  let spaceY = e("#spaceY");
+  let speedX = e("#speedX");
+  let speedY = e("#speedY");
+  let text = "O(∩_∩)O";
+
   for (let i = 0; i < shapes.length; i++) {
     const element = shapes[i];
     bindEvent(element, "click", () => {
@@ -50,15 +58,9 @@ const globalControl = () => {
     });
   }
 
-  let word = e("#word");
-  let breath = e("#breath");
-  let radius = e("#radius");
-  let spaceX = e("#spaceX");
-  let spaceY = e("#spaceY");
-  let speedX = e("#speedX");
-  let speedY = e("#speedY");
-
-  let text = "O(∩_∩)O";
+  bindEvent(btn, "click", () => {
+    control.classList.toggle("hide");
+  });
   bindEvent(word, "change", () => {
     text = word.value;
     change(text);
@@ -86,6 +88,11 @@ const globalControl = () => {
     _SpeedY = parseFloat(speedY.value);
     change(text);
   });
+  window.addEventListener("resize", () => {
+    _W = canvas.width = window.innerWidth;
+    _H = canvas.height = window.innerHeight;
+    change(text);
+  });
 };
 
 const change = (word) => {
@@ -97,7 +104,7 @@ const change = (word) => {
 
 const drawFrame = function () {
   window.requestAnimationFrame(drawFrame);
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.clearRect(0, 0, _W, _H);
   for (var i = 0; i < shape.textZone.length; i++) {
     shape.textZone[i].update(context);
   }
@@ -108,13 +115,6 @@ const _main = () => {
   globalControl();
   shape.getValue(context);
 
-  //   let words = ["Hello", "welcome to", "店宝宝"];
-  //   let i = 0;
-  //   setInterval(() => {
-  //     change(words[i]);
-  //     i++;
-  //     if (i == words.length) i = 0;
-  //   }, 1000);
   drawFrame();
 };
 

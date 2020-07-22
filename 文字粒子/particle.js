@@ -13,6 +13,10 @@ class Particle {
   }
 
   draw(ctx) {
+    ctx.save();
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    this.setRadius();
     switch (ParticleShape) {
       case 0:
         this.circle(ctx);
@@ -23,63 +27,26 @@ class Particle {
       case 2:
         this.Rectangle(ctx);
         break;
-      case 3:
-        this.customShape(ctx);
-        break;
     }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
 
   circle(ctx) {
-    ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    this.setRadius();
     ctx.arc(this.x, this.y, this.radius, Math.PI * 2, false);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
   }
 
   rect(ctx) {
-    ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    this.setRadius();
     ctx.fillRect(this.x, this.y, this.radius, this.radius);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
   }
 
   Rectangle(ctx) {
-    ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    this.setRadius();
     ctx.moveTo(this.x, this.y);
     ctx.lineTo(this.x + this.radius, this.y - this.radius * 2);
     ctx.lineTo(this.x + this.radius * 2, this.y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
   }
 
-  customShape(ctx) {
-    ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    this.setRadius();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x + this.radius / 2, this.y - this.radius);
-    ctx.lineTo(this.x + this.radius, this.y - this.radius);
-    ctx.lineTo(this.x + this.radius, this.y - this.radius * 2);
-    ctx.lineTo(this.x + this.radius * 2, this.y - this.radius * 2);
-    ctx.lineTo(this.x + this.radius * 2, this.y / 2);
-    ctx.lineTo(this.x + this.radius * 2, this.y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
   move() {
     this.x += this.vx;
     this.y += this.vy;

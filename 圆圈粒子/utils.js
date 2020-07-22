@@ -22,6 +22,14 @@ const removeClassAll = function (className) {
 const randomFrom = (start, end) => {
   return start + Math.random() * (end - start);
 };
+
 const randomColors = (colors) => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
+function randomIntFromRange(low, high) {
+  return Math.floor(Math.random() * (high - low + 1) + low);
+}
+
+function randomDoubleFromRange(low, high) {
+  return Math.random() * (high - low + 1) + low;
+}
