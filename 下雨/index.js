@@ -24,16 +24,21 @@ const globalConfig = () => {
   ];
 
   window.particles = [];
-  window._ParticleSize = 4;
+  window._ParticleSize = 50;
   window._WithinRadius = 70;
   window._OutsideRadius = 90;
-  window._Speed = 0.01;
   window._DragSpeed = 0.05;
-  window._DragShadow = 0.1;
+  window._DragShadow = 0.5;
   window.mouse = {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
   };
+  // 下落方向 (-1, 1) -1 越左， 1 越右
+  window._Direction = (mouse.x - _W / 2) / (_W / 2);
+  // 偏移速度
+  window._SpeedX = 0;
+  // 下落速度
+  window._SpeedY = 0.01;
 };
 
 const change = () => {
@@ -60,6 +65,8 @@ const globalControl = () => {
   window.addEventListener("mousemove", function (event) {
     mouse.x = event.clientX;
     mouse.y = event.clientY;
+    _Direction = (mouse.x - _W / 2) / (_W / 2);
+    _SpeedX = _SpeedX + (_Direction - _SpeedX) / 10;
   });
 
   bindEvent(btn, "click", () => {
@@ -79,8 +86,7 @@ const globalControl = () => {
     change();
   });
   bindEvent(speed, "change", () => {
-    _Speed = parseFloat(speed.value);
-    change();
+    _SpeedY = parseFloat(speed.value);
   });
   bindEvent(dragSpeed, "change", () => {
     _DragSpeed = parseFloat(dragSpeed.value);
@@ -94,20 +100,23 @@ const globalControl = () => {
 const drawFrame = function () {
   window.requestAnimationFrame(drawFrame);
   context.fillStyle = `rgba(255, 255, 255,${window._DragShadow})`;
-  context.fillRect(0, 0, _W, _H);
-  for (let p of window.particles) {
+  context.clearRect(0, 0, _W, _H);
+  for (let i = 0; i < 1; i++) {
+    let color = "#fff";
+    particles.push(new Particle(_W, _H / 3, _ParticleSize, color));
+  }
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
     p.update(context);
+    if (p.y > _H) {
+      particles.splice(i, 1);
+    }
   }
 };
 
 const _main = () => {
   globalConfig();
   globalControl();
-
-  for (let i = 0; i < 50; i++) {
-    let color = randomColors(colors);
-    particles.push(new Particle(_W / 2, _H / 2, _ParticleSize, color));
-  }
 
   drawFrame();
 };

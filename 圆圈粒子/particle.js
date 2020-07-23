@@ -26,11 +26,6 @@ class Particle {
     ctx.restore();
   }
 
-  updateVariable() {
-    this.radius = _ParticleSize;
-    this.distance = randomFrom(_WithinRadius, _OutsideRadius);
-  }
-
   update(context) {
     let lastPosition = {
       x: this.x,
