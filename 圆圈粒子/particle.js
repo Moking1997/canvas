@@ -4,9 +4,9 @@ class Particle {
     this.y = y;
     this.radius = radius;
     this.color = color;
-    this.theta = randomDoubleFromRange(0, 2 * Math.PI);
+    this.theta = randomFrom(0, 2 * Math.PI);
     this.speed = 0.05;
-    this.distance = randomIntFromRange(70, 90);
+    this.distance = randomFrom(_WithinRadius, _OutsideRadius);
     this.dragSpeed = 0.05;
     this.lastMouse = {
       x: x,
@@ -26,6 +26,11 @@ class Particle {
     ctx.restore();
   }
 
+  updateVariable() {
+    this.radius = _ParticleSize;
+    this.distance = randomFrom(_WithinRadius, _OutsideRadius);
+  }
+
   update(context) {
     let lastPosition = {
       x: this.x,
@@ -35,7 +40,7 @@ class Particle {
     // 拖拽效果
     this.lastMouse.x += (mouse.x - this.lastMouse.x) * this.dragSpeed;
     this.lastMouse.y += (mouse.y - this.lastMouse.y) * this.dragSpeed;
-    // 1  x
+
     this.x = this.lastMouse.x + Math.cos(this.theta) * this.distance;
     this.y = this.lastMouse.y + Math.sin(this.theta) * this.distance;
 

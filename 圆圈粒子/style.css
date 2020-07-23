@@ -30,20 +30,6 @@ body {
   background-color: rgba(0, 0, 0, 0.5);
   font-size: 14px;
 }
-.shape {
-  display: inline-block;
-  width: 55px;
-  height: 30px;
-  line-height: 30px;
-  text-align: center;
-  cursor: pointer;
-  border: 1px solid #6b6060;
-  color: #444;
-  border-radius: 10px;
-}
-.shape-active {
-  background: orange;
-}
 
 #control h1 {
   font-size: 30px;
@@ -104,7 +90,7 @@ body {
   width: 20px;
   height: 1px;
   margin-bottom: 4px;
-  border-bottom: 2px solid #fff;
+  border-bottom: 2px solid #49f;
 }
 
 #tips {
