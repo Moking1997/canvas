@@ -38,7 +38,7 @@ const globalConfig = () => {
   // 偏移速度
   window._SpeedX = 0;
   // 下落速度
-  window._SpeedY = 0.01;
+  window._SpeedY = 10;
 };
 
 const change = () => {
@@ -66,7 +66,7 @@ const globalControl = () => {
     mouse.x = event.clientX;
     mouse.y = event.clientY;
     _Direction = (mouse.x - _W / 2) / (_W / 2);
-    _SpeedX = _SpeedX + (_Direction - _SpeedX) / 10;
+    _SpeedX = _SpeedX + (_Direction - _SpeedX) / 5;
   });
 
   bindEvent(btn, "click", () => {
@@ -97,28 +97,39 @@ const globalControl = () => {
   });
 };
 
+
+
+
 const drawFrame = function () {
   window.requestAnimationFrame(drawFrame);
   context.fillStyle = `rgba(255, 255, 255,${window._DragShadow})`;
   context.clearRect(0, 0, _W, _H);
-  for (let i = 0; i < 1; i++) {
-    let color = "#fff";
-    particles.push(new Particle(_W, _H / 3, _ParticleSize, color));
-  }
+
   for (let i = 0; i < particles.length; i++) {
     const p = particles[i];
     p.update(context);
-    if (p.y > _H) {
-      particles.splice(i, 1);
+    if (p.y > _H - 200) {
+      for (let i = 0; i < randomFrom(3, 5); i++) {
+        const e = new Bounce(p.x, p.y)
+        p.bounces.push(e)
+      }
     }
+    // if (p.y > _H) {
+    //   particles.splice(i, 1);
+    // }
   }
+
 };
 
 const _main = () => {
   globalConfig();
-  globalControl();
-
+  // globalControl();
+  for (let i = 0; i < 10; i++) {
+    let color = "#fff";
+    particles.push(new Particle(_W, _H / 3, _ParticleSize, color));
+  }
   drawFrame();
+
 };
 
 _main();
